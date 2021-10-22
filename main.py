@@ -9,12 +9,30 @@ __human_name__ = 'superpy'
 
 # Your code below this line.
 def main():    
-    product=[1,'orange','17-10-2021',100,'28-10-2021']
-    #products_list = write_csv('csv/bought.csv',product)
-    
-    products_list=read_csv('csv/bought.csv')
-    print(count_val(products_list,'orange'))
-        
+    args=get_arguments()
+    if args.com=='inventory':
+        csv= read_csv('csv/bought.csv')
+        iterate_list(csv)
+    elif args.com=='buy':
+         for arg in vars(args):
+            print(getattr(args, arg))
+    elif args.com=='sold':
+        csv = read_csv('csv/sold.csv')
+        iterate_list(csv)
+
+def iterate_list(l_arr):
+    for item in l_arr:
+        print(item)
+
+def get_arguments():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--com')
+    parser.add_argument('--id')
+    parser.add_argument('--buy_date')
+    parser.add_argument('--product')
+    parser.add_argument('--expiration')
+    return parser.parse_args()
+
 def count_val(products,product):
     val=0
     for item in products:
