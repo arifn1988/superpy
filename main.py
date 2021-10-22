@@ -14,8 +14,7 @@ def main():
         csv= read_csv('csv/bought.csv')
         iterate_list(csv)
     elif args.com=='buy':
-         for arg in vars(args):
-            print(getattr(args, arg))
+         iterate_list(vars(args))
     elif args.com=='sold':
         csv = read_csv('csv/sold.csv')
         iterate_list(csv)
@@ -28,8 +27,9 @@ def get_arguments():
     parser = argparse.ArgumentParser()
     parser.add_argument('--com')
     parser.add_argument('--id')
-    parser.add_argument('--buy_date')
     parser.add_argument('--product')
+    parser .add_argument('--price')
+    parser.add_argument('--buy_date')
     parser.add_argument('--expiration')
     return parser.parse_args()
 
