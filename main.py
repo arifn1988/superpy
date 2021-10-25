@@ -8,28 +8,43 @@ __winc_id__ = 'a2bc36ea784242e4989deb157d527ba0'
 __human_name__ = 'superpy'
 
 # Your code below this line.
-def main():    
+def main(): 
     args=get_arguments()
     if args.com=='inventory':
         csv= read_csv('csv/bought.csv')
         iterate_list(csv)
-    elif args.com=='buy':
-         iterate_list(vars(args))
     elif args.com=='sold':
         csv = read_csv('csv/sold.csv')
         iterate_list(csv)
+    elif args.com=='buy':
+        product=[args.id,args.product,args.buy_date,args.price,args.expiration]
+        write_csv('csv/bought.csv',product)
+    elif args.com=='sell':
+        product=[1,args.id,args.sell_date,args.price]
+        csv = write_csv('csv/sold.csv',product)
+        bought = read_csv('csv/bought.csv')
+        iterate_list(bought)
 
 def iterate_list(l_arr):
+    row = next(l_arr)
+    print(get_formatted_string(row).format(*row))
     for item in l_arr:
-        print(item)
+        print(get_formatted_string(item).format(*item))
+
+def get_formatted_string(arr):
+    s =""
+    for x in range(len(arr)):
+        s+="{}      "    
+    return s
 
 def get_arguments():
     parser = argparse.ArgumentParser()
     parser.add_argument('--com')
     parser.add_argument('--id')
     parser.add_argument('--product')
-    parser .add_argument('--price')
+    parser.add_argument('--price')
     parser.add_argument('--buy_date')
+    parser.add_argument('--sell_date')
     parser.add_argument('--expiration')
     return parser.parse_args()
 
