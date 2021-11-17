@@ -10,30 +10,27 @@ __human_name__ = 'superpy'
 
 # Your code below this line.
 def main(): 
-    csv = read_csv('csv/bought.csv')
-    d_file = csv_Dict(csv)
-
-    for key in d_file:
-        print(key+' :'+str(d_file[key]))
+    chance_row('csv/bought.csv','1','orange','apple')
+   
+def chance_row(file,row_id,old_val,new_val):    
+    csv = read_csv(file)
+    rows=[]
     
-"""
-    Turns a csv file to a dictionary file
-"""
-def csv_Dict(file):
-    arr= create_dict(next(file))
+    for line in csv:
+        if row_id == line[0]:
+            line[line.index(old_val)] = new_val
 
-    for line in file:
-        for key in arr:
-            arr[key].append(line.pop(0))
+        rows.append(line)
 
-    return arr  
-
+    write_to_csv('csv/bought.csv',rows.pop(0),'w')
+    for row in rows:
+        write_csv('csv/bought.csv',row)
+        
 def get_today():
     return date.today()
 
 def set_days(num):
     return get_today()+timedelta(days=num)
-
 
 def create_dict(arr):
     d_arr ={}
@@ -80,7 +77,10 @@ def read_csv(file_path):
     Append a new row of the data to the file file_path
 """
 def write_csv(file_path,data):
-    file= open(file_path,'a')   
+    return write_to_csv(file_path,data,'a')
+
+def write_to_csv(file_path,data,action):
+    file= open(file_path,action)   
     csv_file= csv.writer(file)
     csv_file.writerow(data)
     return read_csv(file_path)
