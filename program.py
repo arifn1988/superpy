@@ -1,4 +1,3 @@
-# Imports
 import argparse
 import csv
 from datetime import date
@@ -10,9 +9,26 @@ __human_name__ = 'superpy'
 
 # Your code below this line.
 def main(): 
-    chance_row('csv/bought.csv','1','orange','apple')
-   
-def chance_row(file,row_id,old_val,new_val):    
+    print(csv_to_dict('csv/bought.csv'))
+ 
+def csv_to_dict(file):
+    csv = read_csv(file)
+    header= next(csv)
+    products=[]
+
+    for line in csv:
+        csv_dict = {x:[] for x in header}
+        counter = 0
+        for key in csv_dict:
+            csv_dict[key]=line[counter]
+            counter+=1
+        products.append(csv_dict)
+
+
+    return products
+
+
+def change_row(file,row_id,old_val,new_val):    
     csv = read_csv(file)
     rows=[]
     
@@ -25,12 +41,9 @@ def chance_row(file,row_id,old_val,new_val):
     write_to_csv('csv/bought.csv',rows.pop(0),'w')
     for row in rows:
         write_csv('csv/bought.csv',row)
-        
-def get_today():
-    return date.today()
 
 def set_days(num):
-    return get_today()+timedelta(days=num)
+    return date.today()+timedelta(days=num)
 
 def create_dict(arr):
     d_arr ={}
