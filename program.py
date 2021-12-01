@@ -10,7 +10,7 @@ from rich.table import Table
 __winc_id__ = 'a2bc36ea784242e4989deb157d527ba0'
 __human_name__ = 'superpy'
 
-settings= 'final/settings.txt'
+settings= 'superpy/settings.txt'
 
 # Your code below this line.
 def main(): 
@@ -60,6 +60,11 @@ def get_days():
             return int(line.split('=')[1])
 
     return 0
+
+def advance_time(num):
+    days = get_days()
+    change_days(days+num)
+
 
 def change_days(num):
     file= open(settings,'w')
@@ -115,7 +120,7 @@ def create_Table(header,arr,table_title):
         table.add_column(column)
 
     for item in arr:
-        table.add_row(item[0],item[1],item[2],item[3])
+        table.add_row(item['name'],item['price'],str(item['num']),item['exp'])
 
     console.print(table)
 

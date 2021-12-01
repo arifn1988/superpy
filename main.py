@@ -27,6 +27,8 @@ def main():
         print(sell_product(args))
     elif 'set' in start and 'time' in args :
         program.change_days(args['time'])
+    elif 'advance' in start and 'time' in args:
+        program.advance_time(args['time'])
     else:
         print('2:Select the right combination of commands')
 
@@ -114,7 +116,7 @@ def get_revenue(args):
 def report_inventory(args):
     products = program.csv_to_dict(file_bought)
     time =get_time(args)
-    inventory=[['id','product_name','price','expiration_date']]
+    inventory=[]
 
     while len(products)!=0:
         product = products.pop(0)
@@ -122,13 +124,30 @@ def report_inventory(args):
         exp_date=program.format_time(product['expiration_date'])
         if product['status']=='inventory':
             if time>= buy_date and exp_date>=time:
-                inventory.append([product['id'],product['product_name'],product['buy_price'],product['expiration_date']])
+                item={'name':product['product_name'],'price':product['buy_price'],'exp':product['expiration_date']}
+                inventory.append(item)
         elif 'sold' in product['status']:
             sold_date =program.format_time(product['status'].split('/')[1])
             if time >=buy_date and time<=sold_date:
-                inventory.append([product['id'],product['product_name'],product['buy_price'],product['expiration_date']])
-    
-    program.create_Table(inventory.pop(0),inventory,'Inventory:'+str(program.get_date(program.get_days())))
+                item={'name':product['product_name'],'price':product['buy_price'],'exp':product['expiration_date']}
+                inventory.append(item)
+     
+    table=[]
+
+    for item in inventory:
+        if item not in table:
+            table.append(item)
+
+    for item in table:
+        count =0
+        for product in inventory:
+            if product== item:
+                count+=1
+        item['num']=count
+
+    header = ['product_name','price','num','expiration_date']
+    program.create_Table(header,table,'Inventory:'+str(program.get_date(program.get_days())))
+
     return inventory
 
 """
@@ -183,7 +202,8 @@ def get_product(key_name,key_val):
 """ 
 def get_arguments():
     parser =argparse.ArgumentParser()
-    parser.add_argument('start',nargs='+',choices='report inventory profit revenue buy sell set')
+    commands='report inventory profit revenue buy sell set advance'
+    parser.add_argument('start',nargs='+',choices=commands)
     parser.add_argument('--time',type=int)
     parser.add_argument('--product-name','-p-name')
     parser.add_argument('--price','--sell-price','--buy-price')
