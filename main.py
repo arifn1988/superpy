@@ -2,6 +2,7 @@ from datetime import date
 import argparse
 import program
 
+
 file_bought= 'csv/bought.csv'
 file_sold='csv/sold.csv'
 
@@ -36,7 +37,7 @@ def sell_product(args):
     product=get_product('product_name',args['product_name'])
 
     if product:
-        sale =[product_id(file_sold), product['id'],program.get_date(program.get_days()),args['price'],product['buy_price']]
+        sale =[product_id(file_sold), product['id'],program.get_date(program.get_days()),product['buy_price'],args['price']]
         program.write_csv(file_sold,sale)
         program.change_row(file_bought,product['id'],'inventory','sold/'+str(program.get_date(program.get_days())))
         return 'Product sold'
