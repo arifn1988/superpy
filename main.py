@@ -1,7 +1,9 @@
 from datetime import date
+import csv
 import argparse
+from collections import Counter
+from matplotlib import pyplot as plt
 import program
-
 
 file_bought= 'csv/bought.csv'
 file_sold='csv/sold.csv'
@@ -22,6 +24,8 @@ def main():
             print(get_revenue(args))
         else :
             print('1:Select the right combination of command')
+    elif 'plot' in start and 'inventory' in start:
+        plot_inventory(args)
     elif 'buy' in start and len(start)==1:
         print(buy_product(args))
     elif 'sell' in start and len(start)==1:
@@ -30,6 +34,8 @@ def main():
         program.change_days(args['time'])
     elif 'advance' in start and 'time' in args:
         program.advance_time(args['time'])
+    elif 'clear' in start and len(start)==1:
+        clear_inventory()
     else:
         print('2:Select the right combination of commands')
 
@@ -151,6 +157,49 @@ def report_inventory(args):
 
     return inventory
 
+def plot_inventory(args):
+    csv_file= open('csv/bought.csv')
+    csv_reader = csv.DictReader(csv_file)
+    counter = Counter()
+    products=[]
+
+    time = get_time(args)
+
+    for item in csv_reader:
+        buy_date=program.format_time(item['buy_date']) 
+        exp_date=program.format_time(item['expiration_date'])
+        if item['status']=='inventory':
+            if time>= buy_date and time<= exp_date:
+                products.append('/'.join([item['product_name'],item['buy_price'] , item['expiration_date'] ] ))
+        elif 'sold' in item['status']:
+            sold_date=program.format_time(item['status'].split('/')[1])
+            if buy_date>= time and sold_date<=time:
+                products.append('/'.join([item['product_name'],item['buy_price'] , item['expiration_date'] ] ))
+
+    counter.update(products)
+    
+    x_axis=[]
+    y_axis=[]
+
+    for count in counter:
+        x_axis.append(count)
+        y_axis.append(counter[count])
+
+    plt.bar(x_axis,y_axis)
+    plt.title("Bar chart inventory")
+    plt.ylabel("amount of products")
+    plt.xlabel("products")  
+
+    plt.show()
+
+def clear_inventory():
+    csv_inventory = program.read_csv(file_bought)
+    header=next(csv_inventory)
+    program.write_to_csv(file_bought,header,'w')
+    csv_sales = program.read_csv(file_sold)
+    header = next(csv_sales)
+    program.write_to_csv(file_sold,header,'w')
+
 """
     Gets the time that is passed through to 
     argparse module and returns the datetime object
@@ -203,7 +252,7 @@ def get_product(key_name,key_val):
 """ 
 def get_arguments():
     parser =argparse.ArgumentParser()
-    commands='report inventory profit revenue buy sell set advance'
+    commands='report inventory profit revenue buy sell set advance plot clear'
     parser.add_argument('start',nargs='+',choices=commands)
     parser.add_argument('--time',type=int)
     parser.add_argument('--product-name','-p-name')
