@@ -1,4 +1,5 @@
 from datetime import date
+from datetime import timedelta
 import csv
 import argparse
 from collections import Counter
@@ -24,8 +25,9 @@ def main():
             print(get_revenue(args))
         else :
             print('1:Select the right combination of command')
-    elif 'plot' in start and 'inventory' in start:
-        plot_inventory(args)
+    elif 'plot' in start: 
+        if'inventory' in start:
+            plot_inventory(args)
     elif 'buy' in start and len(start)==1:
         print(buy_product(args))
     elif 'sell' in start and len(start)==1:
@@ -73,11 +75,11 @@ def get_profit(args):
             buy_date = program.format_time(line['buy_date'])
             exp_date = program.format_time(line['expiration_date'])
             if 'inventory' in line['status']:
-                if buy_date<= time and exp_date>= time:
+                if buy_date==time:
                     costs+=float(line['buy_price'])
             elif 'sold' in line['status']:
                 sold_date = program.format_time(line['status'].split('/')[1])
-                if buy_date>=time and sold_date<= time:
+                if buy_date==time and sold_date<= time:
                     costs+=float(line['buy_price'])
     elif args['date']:
         date = program.format_time(args['date'],'%Y-%m')
@@ -92,7 +94,7 @@ def get_profit(args):
                 if buy_date.year == date.year and buy_date.month== date.month:
                     costs+=float(line['buy_price'])
 
-    return 'The profit is:'+str(get_revenue(args)-costs)
+    return get_revenue(args)-costs
 
 def get_revenue(args):
     revenue =0
@@ -158,39 +160,47 @@ def report_inventory(args):
     return inventory
 
 def plot_inventory(args):
-    csv_file= open('csv/bought.csv')
-    csv_reader = csv.DictReader(csv_file)
-    counter = Counter()
-    products=[]
+    csv_file= open(file_bought)
+    csv_reader = list(csv.DictReader(csv_file))
 
-    time = get_time(args)
+    inventory={}
+    start_time = program.format_time(args['date'],'%m-%Y')
+    end_time =None
 
-    for item in csv_reader:
-        buy_date=program.format_time(item['buy_date']) 
-        exp_date=program.format_time(item['expiration_date'])
-        if item['status']=='inventory':
-            if time>= buy_date and time<= exp_date:
-                products.append('/'.join([item['product_name'],item['buy_price'] , item['expiration_date'] ] ))
-        elif 'sold' in item['status']:
-            sold_date=program.format_time(item['status'].split('/')[1])
-            if buy_date>= time and sold_date<=time:
-                products.append('/'.join([item['product_name'],item['buy_price'] , item['expiration_date'] ] ))
+    if start_time.month == program.get_date(program.get_days()).month:
+        end_time= program.get_date(program.get_days())
+    else:
+        end_time=program.format_time('-'.join([str(start_time.month+1),str(start_time.year)]),'%m-%Y')
 
-    counter.update(products)
+    while start_time<=end_time:
+        products=[]
+
+        for product in csv_reader:
+            buy_date = program.format_time(product['buy_date'])
+            p_str= '/'.join([product['product_name'],product['buy_price'],product['expiration_date']])
+            if product['status'] =='inventory' :
+                exp_date= program.format_time(product['expiration_date'])
+                if buy_date<=start_time and start_time<=exp_date:
+                    products.append(p_str)
+            elif 'sold' in product['status'] :
+                sold_date =program.format_time(product['status'].split('/')[1])
+                if buy_date<=start_time and start_time<=sold_date:
+                    products.append(p_str)
+        if len(products)!=0:
+            inventory[start_time]=products
     
-    x_axis=[]
-    y_axis=[]
+        start_time=start_time+timedelta(days=1)
 
-    for count in counter:
-        x_axis.append(count)
-        y_axis.append(counter[count])
+    x_axis=inventory.keys()
 
-    plt.bar(x_axis,y_axis)
-    plt.title("Bar chart inventory")
-    plt.ylabel("amount of products")
-    plt.xlabel("products")  
+    for item in inventory:
+        count =Counter(inventory[item])
+        print(count)
 
-    plt.show()
+"""
+Clears the inventory of the program and returns everything
+back the beginning 
+"""
 
 def clear_inventory():
     csv_inventory = program.read_csv(file_bought)
@@ -256,7 +266,7 @@ def get_arguments():
     parser.add_argument('start',nargs='+',choices=commands)
     parser.add_argument('--time',type=int)
     parser.add_argument('--product-name','-p-name')
-    parser.add_argument('--price','--sell-price','--buy-price')
+    parser.add_argument('--price')
     parser.add_argument('--expiration-date','-exp')
     time = parser.add_mutually_exclusive_group()
     time.add_argument('--date')

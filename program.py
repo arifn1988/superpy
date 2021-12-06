@@ -71,7 +71,6 @@ def change_days(num):
     line ='days='+(str(num))
     file.write(line)
 
-
 """
     Gets the current date and adds num days to it
     and returns the date
