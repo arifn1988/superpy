@@ -166,6 +166,7 @@ def plot_inventory(args):
     inventory={}
     start_time = program.format_time(args['date'],'%m-%Y')
     end_time =None
+    y_coordinates={}
 
     if start_time.month == program.get_date(program.get_days()).month:
         end_time= program.get_date(program.get_days())
@@ -192,10 +193,24 @@ def plot_inventory(args):
         start_time=start_time+timedelta(days=1)
 
     x_axis=inventory.keys()
+    
+    end = len(x_axis)
+    index = 0
 
     for item in inventory:
-        count =Counter(inventory[item])
-        print(count)
+        counter = Counter(inventory[item])
+        for count in counter:
+            if count not in y_coordinates:
+                y_coordinates[count]=[0]*end
+                y_coordinates[count][index]=counter[count]
+            else:
+                y_coordinates[count][index]=counter[count]
+        index+=1
+
+    for x_coordinate in x_axis:
+        print(x_coordinate)
+        
+    print(y_coordinates)
 
 """
 Clears the inventory of the program and returns everything
