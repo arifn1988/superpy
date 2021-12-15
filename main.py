@@ -26,7 +26,7 @@ def main():
             report_inventory(args)
         elif 'profit' in start:
             date =args['date'] if args['date'] else str(get_time(args))
-            profit =  revenue='[red]The profit for[red] [green]'+date+'[green][red] for is [red] [blue]'+str(get_revenue(args))+'[blue]'
+            profit =  revenue='[red]The profit for[red] [green]'+date+'[green][red] for is [red] [blue]'+str(get_profit(args))+'[blue]'
             program.create_Console(profit)
         elif 'revenue' in start:
             date =args['date'] if args['date'] else str(get_time(args))
@@ -173,11 +173,10 @@ def plot_inventory(args):
     csv_reader = list(csv.DictReader(csv_file))
 
     inventory={}
-    start_time = program.format_time(args['date'],'%m-%Y')
+    start_time = program.format_time(args['date'],'%m-%Y') 
     end_time =None
-    y_coordinates={}
 
-    if start_time.month == program.get_date(program.get_days()).month:
+    if start_time.month == program.get_date(program.get_days()).month and start_time.year == program.get_date(program.get_days()).year:
         end_time= program.get_date(program.get_days())
     else:
         month= start_time.month+1 if start_time.month!=12 else 1
@@ -204,7 +203,7 @@ def plot_inventory(args):
         start_time=start_time+timedelta(days=1)
 
     x_axis=inventory.keys()
-    
+    y_coordinates={}    
     end = len(x_axis)
     index = 0
 
