@@ -4,7 +4,12 @@ import csv
 import argparse
 from collections import Counter
 from matplotlib import pyplot as plt
+import numpy
 import program
+
+# Do not change these lines.
+__winc_id__ = 'a2bc36ea784242e4989deb157d527ba0'
+__human_name__ = 'superpy'
 
 file_bought= 'csv/bought.csv'
 file_sold='csv/sold.csv'
@@ -155,7 +160,7 @@ def report_inventory(args):
         item['num']=count
 
     header = ['product_name','price','num','expiration_date']
-    program.create_Table(header,table,'Inventory:'+str(program.get_date(program.get_days())))
+    program.create_Table(header,table,'Inventory:'+str(get_time(args)))
 
     return inventory
 
@@ -205,17 +210,22 @@ def plot_inventory(args):
                 y_coordinates[count][index]=counter[count]
             else:
                 y_coordinates[count][index]=counter[count]
+
         index+=1
 
     M=program.format_time(args['date'],'%m-%Y')
     plt.title('Inventory :'+str(M.month)+'-'+str(M.year))
-    plt.xlabel('dates')
-    plt.ylabel('number in inventory')
+    plt.ylabel('dates')
+    plt.xlabel('number in inventory')
+    x_indexes = numpy.arange(len(x_axis))
+    index_offset=-1
+    width=0.25
 
     for y in y_coordinates:
+        plt.barh(x_indexes+width*index_offset,y_coordinates[y],height=width,label=y)
+        index_offset+=1
 
-        plt.plot(x_axis,y_coordinates[y],label=y)
-
+    plt.yticks(x_indexes,labels=x_axis)
     plt.legend()
     plt.show()
 
