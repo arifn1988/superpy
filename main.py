@@ -176,7 +176,9 @@ def plot_inventory(args):
     if start_time.month == program.get_date(program.get_days()).month:
         end_time= program.get_date(program.get_days())
     else:
-        end_time=program.format_time('-'.join([str(start_time.month+1),str(start_time.year)]),'%m-%Y')
+        month= start_time.month+1 if start_time.month!=12 else 1
+        year= start_time.year+1 if start_time.month ==12 else start_time.year
+        end_time=program.format_time('-'.join([str(month),str(year)]),'%m-%Y')
 
     while start_time<=end_time:
         products=[]

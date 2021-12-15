@@ -6,11 +6,23 @@ from datetime import datetime
 from rich.console import Console
 from rich.table import Table
 
+# Do not change these lines.
+__winc_id__ = 'a2bc36ea784242e4989deb157d527ba0'
+__human_name__ = 'superpy'
+
 settings= 'superpy/settings.txt'
 
 # Your code below this line.
 def main(): 
-    print(change_days(2))
+   create_Console('Hello [blue]world[blue]')
+
+"""
+    Creates a console and prints the line 
+    that is passed as a parameter
+"""
+def create_Console(line):
+    console = Console()
+    console.print(line)
  
 """
     Returns a list with each line
@@ -66,7 +78,6 @@ def change_days(num):
     file= open(settings,'w')
     line ='days='+(str(num))
     file.write(line)
-
 
 """
     Gets the current date and adds num days to it
