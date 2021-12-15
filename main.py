@@ -25,9 +25,13 @@ def main():
         if 'inventory' in start:
             report_inventory(args)
         elif 'profit' in start:
-            print(get_profit(args))
+            date =args['date'] if args['date'] else str(get_time(args))
+            profit =  revenue='[red]The profit for[red] [green]'+date+'[green][red] for is [red] [blue]'+str(get_revenue(args))+'[blue]'
+            program.create_Console(profit)
         elif 'revenue' in start:
-            print(get_revenue(args))
+            date =args['date'] if args['date'] else str(get_time(args))
+            revenue='[red]The revenue for[red] [green]'+date+'[green][red] for is [red] [blue]'+str(get_revenue(args))+'[blue]'
+            program.create_Console(revenue)
         else :
             print('1:Select the right combination of command')
     elif 'plot' in start: 
