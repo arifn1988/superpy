@@ -70,7 +70,7 @@ def buy_product(args):
             program.write_csv(file_bought,product)
             return 'Product bought!!!'
         else:
-            return 'Expiration date is greater than buy date'
+            return 'Expiration date is lesser than buy date'
     else:
         return 'Add all the correct arguments to buy product'
 
@@ -173,7 +173,7 @@ def plot_inventory(args):
     csv_reader = list(csv.DictReader(csv_file))
 
     inventory={}
-    start_time = program.format_time(args['date'],'%m-%Y') 
+    start_time = program.format_time(args['date'],'%Y-%m') 
     end_time =None
 
     if start_time.month == program.get_date(program.get_days()).month and start_time.year == program.get_date(program.get_days()).year:
@@ -181,7 +181,7 @@ def plot_inventory(args):
     else:
         month= start_time.month+1 if start_time.month!=12 else 1
         year= start_time.year+1 if start_time.month ==12 else start_time.year
-        end_time=program.format_time('-'.join([str(month),str(year)]),'%m-%Y')
+        end_time=program.format_time('-'.join([str(year),str(month)]),'%Y-%m')
 
     while start_time<=end_time:
         products=[]
@@ -218,8 +218,8 @@ def plot_inventory(args):
 
         index+=1
 
-    M=program.format_time(args['date'],'%m-%Y')
-    plt.title('Inventory :'+str(M.month)+'-'+str(M.year))
+    M=program.format_time(args['date'],'%Y-%m')
+    plt.title('Inventory :'+str(M.year)+'-'+str(M.month))
     plt.ylabel('dates')
     plt.xlabel('number in inventory')
     x_indexes = numpy.arange(len(x_axis))
@@ -255,7 +255,7 @@ def get_time(args):
     if args['yesterday']:
         return program.get_date(program.get_days()-1)
     elif args['date']:
-        return program.format_time(reverse_date(args['date']))
+        return program.format_time(args['date'])
     else:
         return program.get_date(program.get_days())
 
