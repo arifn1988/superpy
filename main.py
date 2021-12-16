@@ -63,7 +63,7 @@ def sell_product(args):
 
 def buy_product(args):
     if args['product_name'] and args['expiration_date'] and args['price']:
-        exp_date= reverse_date(args['expiration_date'])
+        exp_date= args['expiration_date']
         buy_date=program.get_date(program.get_days())
         if program.format_time(exp_date)>= buy_date:
             product=[product_id(file_bought),args['product_name'],buy_date,args['price'],exp_date,'inventory']
@@ -165,6 +165,7 @@ def report_inventory(args):
 
     header = ['product_name','price','num','expiration_date']
     program.create_Table(header,table,'Inventory:'+str(get_time(args)))
+    program.create_Console('[blue]Price[blue] : [green]Represtents price per piece[green]')
 
     return inventory
 
