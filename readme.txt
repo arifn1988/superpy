@@ -56,3 +56,8 @@ To view the profit:
 	This will give the profit of the profit of 2021-11. On must use 
 	the time format %Y-%m where Y is the year and m is the month. Anything else 
 	will not work. 	
+	
+To plot the inventory :
+	Running: python superpy/main.py report inventory --date 2021-11
+	Will plot the revenue of the month 2021-11. Be careful not the input incorrect
+	date formats or else the program will give a error message.
