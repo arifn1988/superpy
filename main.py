@@ -142,28 +142,26 @@ def report_inventory(args):
         exp_date=program.format_time(product['expiration_date'])
         if product['status']=='inventory':
             if time>= buy_date and exp_date>=time:
-                item={'name':product['product_name'],'price':product['buy_price'],'exp':product['expiration_date']}
+                item='/'.join([product['product_name'],product['buy_price'],product['expiration_date']])
                 inventory.append(item)
         elif 'sold' in product['status']:
             sold_date =program.format_time(product['status'].split('/')[1])
             if time >=buy_date and time<=sold_date:
-                item={'name':product['product_name'],'price':product['buy_price'],'exp':product['expiration_date']}
+                item='/'.join([product['product_name'],product['buy_price'],product['expiration_date']])
                 inventory.append(item)
      
     table=[]
 
-    for item in inventory:
-        if item not in table:
-            table.append(item)
+    counter =Counter(inventory)
 
-    for item in table:
-        count =0
-        for product in inventory:
-            if product== item:
-                count+=1
-        item['num']=count
 
     header = ['product_name','price','num','expiration_date']
+    for count in counter:
+        item =count.split('/')
+        item.insert(2,counter[count])
+        d_item=dict(zip(header,item))
+        table.append(d_item)
+
     program.create_Table(header,table,'Inventory:'+str(get_time(args)))
     program.create_Console('[blue]Price[blue] : [green]Represtents price per piece[green]')
 

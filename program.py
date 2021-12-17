@@ -10,7 +10,7 @@ from rich.table import Table
 __winc_id__ = 'a2bc36ea784242e4989deb157d527ba0'
 __human_name__ = 'superpy'
 
-settings= 'superpy/settings.txt'
+settings= 'txt/settings.txt'
 
 # Your code below this line.
 def main(): 
@@ -127,7 +127,7 @@ def create_Table(header,arr,table_title):
         table.add_column(column)
 
     for item in arr:
-        table.add_row(item['name'],item['price'],str(item['num']),item['exp'])
+        table.add_row(item['product_name'],item['price'],str(item['num']),item['expiration_date'])
 
     console.print(table)
 
