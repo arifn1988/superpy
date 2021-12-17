@@ -61,3 +61,11 @@ To plot the inventory :
 	Running: python superpy/main.py report inventory --date 2021-11
 	Will plot the revenue of the month 2021-11. Be careful not the input incorrect
 	date formats or else the program will give a error message.
+To set time : 
+	Running python superpy/main.py set --time [days] 
+	This will add a number of days to the current time of the year. For example if today is 
+	17-12-2021, then adding two days means the program time is 19-12-2021. 
+	
+	Running python superpy/main.py advance --time [days]
+	Will advance the program time by the amount of days. For example if program time is 25-12-2021,
+	then adding  three days to the program time will mean the program time will become 28-12-2021
