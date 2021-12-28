@@ -6,6 +6,9 @@ from collections import Counter
 from matplotlib import pyplot as plt
 import numpy
 import program
+from pathlib import Path
+from rich.console import Console
+from rich.table import Table
 
 # Do not change these lines.
 __winc_id__ = 'a2bc36ea784242e4989deb157d527ba0'
@@ -47,8 +50,68 @@ def main():
         program.advance_time(args['time'])
     elif 'clear' in start and len(start)==1:
         clear_inventory()
+    elif 'sales' in start:
+        export_sales(args)
     else:
         print('2:Select the right combination of commands')
+
+def export_sales(args):
+    bought = list(csv.DictReader(open(file_bought)))
+    sold = list(csv.DictReader(open(file_sold)))
+    data=[]
+    time=[]
+
+    if ':' in args['date']:
+        time = args['date'].split(':')
+        time = [program.format_time(x) for x in time]
+        if time[0]>time[1]:
+            print('Start time greater than the end time')
+            quit()
+    elif args['date'].count('-')==2:
+        time=[program.format_time(args['date'])]*2
+    elif args['date'].count('-')==1:
+        time.append(program.format_time(args['date'],'%Y-%m'))
+        time.append(time[0]+timedelta(days=31))
+        time[1]=program.format_time(str(time[1])[0:7],'%Y-%m')
+    else:
+        print('Enter a date format that is correct')
+        quit()
+
+    for row in bought:
+        status=row['status'].split('/')
+        if status[0]=='sold':
+            sell_date = program.format_time(status[1])
+            if time[0]<=sell_date<=time[1]:
+                for line in sold:
+                    if row['id'] == line['bought_id']:
+                        data.append([row['product_name'],row['buy_price'],line['sell_price'],line['sell_date']])
+
+    header=['product_name','buy_price','sell_price','sell_date']
+
+    program.write_to_csv('csv/sales.csv',header,'w+')
+
+    for line in data:
+        program.write_csv('csv/sales.csv',line)
+
+    if len(data)==0: 
+        program.create_Console('[green] No sales for the time period:[green] [red]'+str(args['date'])+'[red]')
+    elif args['view']=='y':
+        file = open('csv/sales.csv','r')
+        sales = list(csv.DictReader(file))
+
+        header=list(sales[0].keys())
+        console = Console()
+
+        table = Table(show_header=True, header_style='bold #2070b2',title='sales overview')
+        for column in header:
+            table.add_column(column)
+
+        for item in sales:
+            table.add_row(item['product_name'],item['buy_price'],str(item['sell_price']),item['sell_date'])
+
+        console.print(table)
+    else:
+        program.create_Console('[green]Succesfully created and exported the file :[green][red]sales.csv[red]')
 
 def sell_product(args):
     product=get_product('product_name',args['product_name'])
@@ -125,9 +188,11 @@ def get_revenue(args):
             sold_date= program.format_time(line['sell_date'])
             if time.year == sold_date.year and time.month == sold_date.month:
                 revenue+=float(line['sell_price'])
-
         return revenue
-
+    else:
+        program.create_Console('[green]Enter the[green] [red]correct arguments[red] [green] for the program [green]')
+        quit()
+    
     return 0
 
 """
@@ -154,9 +219,7 @@ def report_inventory(args):
                 inventory.append(item)
      
     table=[]
-
     counter =Counter(inventory)
-
 
     header = ['product_name','price','num','expiration_date']
     for count in counter:
@@ -174,14 +237,10 @@ def plot_inventory(args):
 
     inventory={}
     start_time = program.format_time(args['date'],'%Y-%m') 
-    end_time =None
-
-    if start_time.month == program.get_date(program.get_days()).month and start_time.year == program.get_date(program.get_days()).year:
-        end_time= program.get_date(program.get_days())
-    else:
-        month= start_time.month+1 if start_time.month!=12 else 1
-        year= start_time.year+1 if start_time.month ==12 else start_time.year
-        end_time=program.format_time('-'.join([str(year),str(month)]),'%Y-%m')
+   
+    month= start_time.month+1 if start_time.month!=12 else 1
+    year= start_time.year+1 if start_time.month ==12 else start_time.year
+    end_time=program.format_time('-'.join([str(year),str(month)]),'%Y-%m')
 
     while start_time<=end_time:
         products=[]
@@ -260,15 +319,6 @@ def get_time(args):
         return program.get_date(program.get_days())
 
 """
-    Reverses the date of date to match 
-    iso format
-"""
-def reverse_date(date):
-    arr=date.split('-')
-    arr.reverse()
-    return '-'.join(arr)
-
-"""
  Creates a new product id for a product
  and returns the value of the id
 """
@@ -299,16 +349,17 @@ def get_product(key_name,key_val):
 """ 
 def get_arguments():
     parser =argparse.ArgumentParser()
-    commands='report inventory profit revenue buy sell set advance plot clear'
-    parser.add_argument('start',nargs='+',choices=commands)
-    parser.add_argument('--time',type=int)
-    parser.add_argument('--product-name','-p-name')
-    parser.add_argument('--price')
-    parser.add_argument('--expiration-date','-exp')
+    commands='report inventory profit revenue buy sell set advance plot clear sales'
+    parser.add_argument('start',nargs='+',choices=commands,help='')
+    parser.add_argument('--time',type=int,help='use in combination with the command set or advance')
+    parser.add_argument('--product-name','-p-name', help = 'Use when you want to sell or buy a product')
+    parser.add_argument('--price',help='Use when you want to buy or sell a product.')
+    parser.add_argument('--expiration-date','-exp',help='Use when you want to buy a product ')
+    parser.add_argument('--view')
     time = parser.add_mutually_exclusive_group()
-    time.add_argument('--date')
-    time.add_argument('--now',action='store_true')
-    time.add_argument('--yesterday',action='store_true')
+    time.add_argument('--date',help='Use when you want to view the inventory,revenue or profit')
+    time.add_argument('--now',action='store_true', help='Use when you want to view the inventory,revenue or profit of the current program time')
+    time.add_argument('--yesterday',action='store_true',help='Use when you want to view the inventory,revenue or profit of yesterday')
     args = parser.parse_args()
 
     return vars(args)

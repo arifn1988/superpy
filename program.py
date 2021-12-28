@@ -12,10 +12,6 @@ __human_name__ = 'superpy'
 
 settings= 'txt/settings.txt'
 
-# Your code below this line.
-def main(): 
-   create_Console('Hello [blue]world[blue]')
-
 """
     Creates a console and prints the line 
     that is passed as a parameter
