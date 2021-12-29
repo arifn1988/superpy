@@ -28,11 +28,11 @@ def main():
         if 'inventory' in start:
             report_inventory(args)
         elif 'profit' in start:
-            date =args['date'] if args['date'] else str(get_time(args))
+            date =args['date'] if args['date'] else str(program.get_time(args))
             profit =  revenue='[red]The profit for[red] [green]'+date+'[green][red] for is [red] [blue]'+str(get_profit(args))+'[blue]'
             program.create_Console(profit)
         elif 'revenue' in start:
-            date =args['date'] if args['date'] else str(get_time(args))
+            date =args['date'] if args['date'] else str(program.get_time(args))
             revenue='[red]The revenue for[red] [green]'+date+'[green][red] for is [red] [blue]'+str(get_revenue(args))+'[blue]'
             program.create_Console(revenue)
         else :
@@ -50,7 +50,7 @@ def main():
         program.advance_time(args['time'])
     elif 'clear' in start and len(start)==1:
         clear_inventory()
-    elif 'sales' in start:
+    elif 'export-sales' in start:
         export_sales(args)
     else:
         print('2:Select the right combination of commands')
@@ -65,7 +65,7 @@ def export_sales(args):
         time = args['date'].split(':')
         time = [program.format_time(x) for x in time]
         if time[0]>time[1]:
-            print('Start time greater than the end time')
+            program.create_Console('[red]Start time[red] [green]greater than [green] [red]the end time [red]')
             quit()
     elif args['date'].count('-')==2:
         time=[program.format_time(args['date'])]*2
@@ -97,12 +97,11 @@ def export_sales(args):
         program.create_Console('[green] No sales for the time period:[green] [red]'+str(args['date'])+'[red]')
     elif args['view']=='y':
         file = open('csv/sales.csv','r')
-        sales = list(csv.DictReader(file))
-
+        sales = sorted(list(csv.DictReader(file)),key=lambda k :k['sell_date'])
         header=list(sales[0].keys())
         console = Console()
 
-        table = Table(show_header=True, header_style='bold #2070b2',title='sales overview')
+        table = Table(show_header=True, header_style='bold #2070b2',title='[green]sales overview[green]:[bold][red]'+str(args['date'])+'[red][bold]')
         for column in header:
             table.add_column(column)
 
@@ -114,10 +113,10 @@ def export_sales(args):
         program.create_Console('[green]Succesfully created and exported the file :[green][red]sales.csv[red]')
 
 def sell_product(args):
-    product=get_product('product_name',args['product_name'])
+    product=program.get_product('product_name',args['product_name'])
 
     if product:
-        sale =[product_id(file_sold), product['id'],program.get_date(program.get_days()),args['price']]
+        sale =[program.product_id(file_sold), product['id'],program.get_date(program.get_days()),args['price']]
         program.write_csv(file_sold,sale)
         program.change_row(file_bought,product['id'],'inventory','sold/'+str(program.get_date(program.get_days())))
         return 'Product sold'
@@ -129,7 +128,7 @@ def buy_product(args):
         exp_date= args['expiration_date']
         buy_date=program.get_date(program.get_days())
         if program.format_time(exp_date)>= buy_date:
-            product=[product_id(file_bought),args['product_name'],buy_date,args['price'],exp_date,'inventory']
+            product=[program.product_id(file_bought),args['product_name'],buy_date,args['price'],exp_date,'inventory']
             program.write_csv(file_bought,product)
             return 'Product bought!!!'
         else:
@@ -142,7 +141,7 @@ def get_profit(args):
     csv = program.csv_to_dict(file_bought)
     
     if args['now'] or args['yesterday']:
-        time = get_time(args)
+        time = program.get_time(args)
         for line in csv:
             buy_date = program.format_time(line['buy_date'])
             exp_date = program.format_time(line['expiration_date'])
@@ -176,7 +175,7 @@ def get_revenue(args):
     csv = program.csv_to_dict(file_sold)
 
     if args['now'] or args['yesterday']:
-        time = get_time(args)
+        time = program.get_time(args)
         for line in csv:
             sold_date =program.format_time(line['sell_date'])
             if sold_date ==time:
@@ -201,7 +200,7 @@ def get_revenue(args):
 """
 def report_inventory(args):
     products = program.csv_to_dict(file_bought)
-    time =get_time(args)
+    time =program.get_time(args)
     inventory=[]
 
     while len(products)!=0:
@@ -228,7 +227,7 @@ def report_inventory(args):
         d_item=dict(zip(header,item))
         table.append(d_item)
 
-    program.create_Table(header,table,'Inventory:'+str(get_time(args)))
+    program.create_Table(header,table,'Inventory:'+str(program.get_time(args)))
     program.create_Console('[blue]Price[blue] : [green]Represents price per piece[green]')
 
 def plot_inventory(args):
@@ -306,53 +305,17 @@ def clear_inventory():
     header = next(csv_sales)
     program.write_to_csv(file_sold,header,'w')
 
-"""
-    Gets the time that is passed through to 
-    argparse module and returns the datetime object
-"""
-def get_time(args):
-    if args['yesterday']:
-        return program.get_date(program.get_days()-1)
-    elif args['date']:
-        return program.format_time(args['date'])
-    else:
-        return program.get_date(program.get_days())
 
-"""
- Creates a new product id for a product
- and returns the value of the id
-"""
-def product_id(file):
-    csv= program.read_csv(file)
-    count =0
-
-    for line in csv: 
-        count+=1
-
-    return count
-
-""""
-    Returns a product with the pname and pval 
-"""
-def get_product(key_name,key_val):
-    products=program.csv_to_dict(file_bought)
-
-    for product in products:
-        exp_date = program.format_time(product['expiration_date'])
-        if product[key_name]==key_val and product['status']=='inventory' and exp_date>=program.get_date(program.get_days()):
-                return product
-
-    return None
 """
     Parse args and returns them in the form of 
     a dictionary
 """ 
 def get_arguments():
     parser =argparse.ArgumentParser()
-    commands='report inventory profit revenue buy sell set advance plot clear sales'
+    commands='report inventory profit revenue buy sell set advance plot clear export-sales'
     parser.add_argument('start',nargs='+',choices=commands,help='')
     parser.add_argument('--time',type=int,help='use in combination with the command set or advance')
-    parser.add_argument('--product-name','-p-name', help = 'Use when you want to sell or buy a product')
+    parser.add_argument('--product-name', help = 'Use when you want to sell or buy a product')
     parser.add_argument('--price',help='Use when you want to buy or sell a product.')
     parser.add_argument('--expiration-date','-exp',help='Use when you want to buy a product ')
     parser.add_argument('--view')

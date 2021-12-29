@@ -11,6 +11,7 @@ __winc_id__ = 'a2bc36ea784242e4989deb157d527ba0'
 __human_name__ = 'superpy'
 
 settings= 'txt/settings.txt'
+file_bought= 'csv/bought.csv'
 
 """
     Creates a console and prints the line 
@@ -19,7 +20,32 @@ settings= 'txt/settings.txt'
 def create_Console(line):
     console = Console()
     console.print(line)
+
+""""
+    Returns a product with the pname and pval 
+"""
+def get_product(key_name,key_val):
+    products=csv_to_dict(file_bought)
+
+    for product in products:
+        exp_date = format_time(product['expiration_date'])
+        if product[key_name]==key_val and product['status']=='inventory' and exp_date>=get_date(get_days()):
+                return product
+    return None
  
+"""
+ Creates a new product id for a product
+ and returns the value of the id
+"""
+def product_id(file):
+    csv= read_csv(file)
+    count =0
+
+    for line in csv: 
+        count+=1
+
+    return count
+
 """
     Returns a list with each line
     of the csv file as a dictionary with
@@ -64,6 +90,19 @@ def get_days():
             return int(line.split('=')[1])
 
     return 0
+
+"""
+    Gets the time that is passed through to 
+    argparse module and returns the datetime object
+"""
+def get_time(args):
+    if args['yesterday']:
+        return get_date(get_days()-1)
+    elif args['date']:
+        return format_time(args['date'])
+    else:
+        return get_date(get_days())
+
 
 def advance_time(num):
     days = get_days()
