@@ -14,7 +14,7 @@ To sell a product from the inventory :
 	This will sell a product if it is present in the inventory. Will record the current time in the 
 	program as the sell date 
 
-	Running: python main.py sell --p-name [product] --price [sell-price]
+	Running: python main.py sell -p-name [product] --price [sell-price]
 	This will sell a product if it is present in the inventory. Will record the current time in the 
 	program as the sell date 
 
@@ -75,3 +75,17 @@ To set time :
 To clear the inventory:
 	Run : python main.py clear
 	Which deletes all entries in bought.csv and sold.csv
+
+To get export a overview of the sales
+	Run : python main.py export-sales --date 2021-12
+	Which will export all sales in the month december to a csv file called sales in the folder csv
+
+	Run : python main.py export-sales --date 2021-12-30
+	Which will export all sales for the date 2021-12-30 to a csv file called sales in the folder csv
+
+	Run : python main.py export-sales --date 2021-12-06:2021-12-28
+	Which will export all sales between the given time period (2021-12-06:2021-12-28) to a csv file called sales in the folder csv
+	The first time period has to be smaller then the second one
+
+	If one adds the command --view y to the argument then the program will print out the content of the csv file sales to 
+	the console. For example running: python main.py export-sales --date 2021-12-06:2021-12-28 --view y
