@@ -14,9 +14,6 @@ from rich.table import Table
 __winc_id__ = 'a2bc36ea784242e4989deb157d527ba0'
 __human_name__ = 'superpy'
 
-file_bought= 'csv/bought.csv'
-file_sold='csv/sold.csv'
-
 def main():
     args =get_arguments()
     start = args.pop('start')
@@ -56,8 +53,8 @@ def main():
         print('2:Select the right combination of commands')
 
 def export_sales(args):
-    bought = list(csv.DictReader(open(file_bought)))
-    sold = list(csv.DictReader(open(file_sold)))
+    bought = list(csv.DictReader(open(program.file_bought)))
+    sold = list(csv.DictReader(open(program.file_sold)))
     data=[]
     time=[]
 
@@ -116,9 +113,9 @@ def sell_product(args):
     product=program.get_product('product_name',args['product_name'])
 
     if product:
-        sale =[program.product_id(file_sold), product['id'],program.get_date(program.get_days()),args['price']]
-        program.write_csv(file_sold,sale)
-        program.change_row(file_bought,product['id'],'inventory','sold/'+str(program.get_date(program.get_days())))
+        sale =[program.product_id(program.file_sold), product['id'],program.get_date(program.get_days()),args['price']]
+        program.write_csv(program.file_sold,sale)
+        program.change_row(program.file_bought,product['id'],'inventory','sold/'+str(program.get_date(program.get_days())))
         return 'Product sold'
     else:
         return 'Product is not in inventory'
@@ -128,8 +125,8 @@ def buy_product(args):
         exp_date= args['expiration_date']
         buy_date=program.get_date(program.get_days())
         if program.format_time(exp_date)>= buy_date:
-            product=[program.product_id(file_bought),args['product_name'],buy_date,args['price'],exp_date,'inventory']
-            program.write_csv(file_bought,product)
+            product=[program.product_id(program.file_bought),args['product_name'],buy_date,args['price'],exp_date,'inventory']
+            program.write_csv(program.file_bought,product)
             return 'Product bought!!!'
         else:
             return 'Expiration date is lesser than buy date'
@@ -138,7 +135,7 @@ def buy_product(args):
 
 def get_profit(args):
     costs =0
-    csv = program.csv_to_dict(file_bought)
+    csv = program.csv_to_dict(program.file_bought)
     
     if args['now'] or args['yesterday']:
         time = program.get_time(args)
@@ -172,7 +169,7 @@ def get_profit(args):
 
 def get_revenue(args):
     revenue =0
-    csv = program.csv_to_dict(file_sold)
+    csv = program.csv_to_dict(program.file_sold)
 
     if args['now'] or args['yesterday']:
         time = program.get_time(args)
@@ -199,7 +196,7 @@ def get_revenue(args):
     of the arguments are are null are passed as parameters it prints the entire inventory
 """
 def report_inventory(args):
-    products = program.csv_to_dict(file_bought)
+    products = program.csv_to_dict(program.file_bought)
     time =program.get_time(args)
     inventory=[]
 
@@ -231,7 +228,7 @@ def report_inventory(args):
     program.create_Console('[blue]Price[blue] : [green]Represents price per piece[green]')
 
 def plot_inventory(args):
-    csv_file= open(file_bought)
+    csv_file= open(program.file_bought)
     csv_reader = list(csv.DictReader(csv_file))
 
     inventory={}
@@ -298,12 +295,12 @@ back the beginning
 """
 
 def clear_inventory():
-    csv_inventory = program.read_csv(file_bought)
+    csv_inventory = program.read_csv(program.file_bought)
     header=next(csv_inventory)
-    program.write_to_csv(file_bought,header,'w')
-    csv_sales = program.read_csv(file_sold)
+    program.write_to_csv(program.file_bought,header,'w')
+    csv_sales = program.read_csv(program.file_sold)
     header = next(csv_sales)
-    program.write_to_csv(file_sold,header,'w')
+    program.write_to_csv(program.file_sold,header,'w')
 
 
 """

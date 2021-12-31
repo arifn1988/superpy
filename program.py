@@ -5,13 +5,17 @@ from datetime import timedelta
 from datetime import datetime
 from rich.console import Console
 from rich.table import Table
+import os
 
 # Do not change these lines.
 __winc_id__ = 'a2bc36ea784242e4989deb157d527ba0'
 __human_name__ = 'superpy'
 
-settings= 'txt/settings.txt'
-file_bought= 'csv/bought.csv'
+directory= os.path.dirname(os.path.abspath(__file__))
+settings= os.path.join(directory,'txt','settings.txt')
+file_bought= os.path.join(directory,'csv','bought.csv')
+file_sold=os.path.join(directory,'csv','sold.csv')
+
 
 """
     Creates a console and prints the line 
