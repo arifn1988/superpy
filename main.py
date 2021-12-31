@@ -70,6 +70,7 @@ def export_sales(args):
         time.append(program.format_time(args['date'],'%Y-%m'))
         time.append(time[0]+timedelta(days=31))
         time[1]=program.format_time(str(time[1])[0:7],'%Y-%m')
+        time[1]=time[1]+timedelta(days=-1)
     else:
         print('Enter a date format that is correct')
         quit()
