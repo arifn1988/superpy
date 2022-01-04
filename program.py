@@ -16,7 +16,6 @@ settings= os.path.join(directory,'txt','settings.txt')
 file_bought= os.path.join(directory,'csv','bought.csv')
 file_sold=os.path.join(directory,'csv','sold.csv')
 
-
 """
     Creates a console and prints the line 
     that is passed as a parameter
@@ -187,6 +186,3 @@ def write_to_csv(file_path,data,action):
     csv_file= csv.writer(file)
     csv_file.writerow(data)
     return read_csv(file_path)
-
-if __name__ == '__main__':
-    main()
